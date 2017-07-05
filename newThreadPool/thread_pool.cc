@@ -72,13 +72,11 @@ ThreadPool::Task ThreadPool::takeOne(){
     std::unique_lock<std::mutex> locker(_m);
     //while or if, maybe all are ok
     if(_queue.empty() && _running){
-        //printf("is empty, waiting..\n");
         _notEmpty.wait(locker);
     }
     Task task;
     //if queue is not empty, wheather the pool is running or not, run the task
     if(!_queue.empty()){
-        //printf("not empty, take one\n");
         task = _queue.front();
         _queue.pop_front();
         if(_maxQueueSize > 0){
