@@ -51,7 +51,7 @@ void ThreadPool::work(){
         Task task = nullptr;
         {
             std::unique_lock<std::mutex> locker(m);
-            if(tasks.empty())
+            if(isrunning && tasks.empty())
                 cond.wait(locker);
             if(!tasks.empty()){
                 task = tasks.front();
