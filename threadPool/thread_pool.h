@@ -18,10 +18,10 @@ public:
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator= (const ThreadPool& rhs) = delete;
 
-    bool start();
-    bool stop();
-    bool append(const Task& task);
-    bool append(Task&& task);
+    void start();
+    void stop();
+    void append(const Task& task);
+    void append(Task&& task);
 private:
     void work();
     bool isrunning;
