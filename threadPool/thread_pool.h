@@ -20,7 +20,8 @@ public:
 
     bool start();
     bool stop();
-    bool append(Task task);
+    bool append(const Task& task);
+    bool append(Task&& task);
 private:
     void work();
     bool isrunning;
