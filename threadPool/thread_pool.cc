@@ -14,21 +14,33 @@ bool ThreadPool::start(){
     return true;
 }
 bool ThreadPool::stop(){
-    if(isrunning){
+    {
+        //如果要停止，改变运行状态，并通知所有线程取任务
+        std::unique_lock<std::mutex> locker(m);
         isrunning = false;
-        for(size_t i = 0; i < thread_num; ++i){
-            auto t = threads[i];
-            if(t->joinable())
-                t->join();
-        }
+        cond.notify_all();
+    }
+    for(size_t i = 0; i < thread_num; ++i){
+        auto t = threads[i];
+        if(t->joinable())
+            t->join();
     }
     return true;
 }
 
-bool ThreadPool::append(Task task){
+bool ThreadPool::append(const Task& task){
     if(isrunning){
         std::lock_guard<std::mutex> locker(m);
-        tasks.push_front(task);
+        tasks.push_back(task);
+        cond.notify_one();
+    }
+    return true;
+}
+
+bool ThreadPool::append(Task&& task){
+    if(isrunning){
+        std::lock_guard<std::mutex> locker(m);
+        tasks.push_back(std::move(task));
         cond.notify_one();
     }
     return true;
@@ -40,12 +52,13 @@ void ThreadPool::work(){
         {
             std::unique_lock<std::mutex> locker(m);
             if(tasks.empty())
-                cond.wait(locker, [&]{return !tasks.empty();});
+                cond.wait(locker);
             if(!tasks.empty()){
                 task = tasks.front();
                 tasks.pop_front();
             }
         }
-        task();
+        if(task)
+            task();
     }
 }
