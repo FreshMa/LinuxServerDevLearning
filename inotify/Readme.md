@@ -77,4 +77,5 @@ int inotify_rm_watch(int fd, int wd) //取消监控
 
 ### 参考链接
 [用 inotify 监控 Linux 文件系统事件](https://www.ibm.com/developerworks/cn/linux/l-inotify/index.html)
+
 [http://man7.org/linux/man-pages/man7/inotify.7.html](http://man7.org/linux/man-pages/man7/inotify.7.html)
