@@ -75,6 +75,14 @@ int inotify_rm_watch(int fd, int wd) //取消监控
 4. 当有对应事件可读时，调用read函数，获取这些就绪的inotify_event 
 5. 根据mask来判断发生了哪些事件，并进行对应的处理
 
+### 实例
+
+InotifyReload类实现了对数据文件的实时监听，当数据文件发生变化之后，可以调用预定义的回调函数；如果没有指定回调函数，那么会简单地保存数据文件内容，并可以通过GetContent方法来获取文件内容。
+
+这个可以用来改进定时加载数据文件的逻辑，像我们项目中之前的数据加载逻辑是去继承一个加载类，这个类定义了一个procReload函数，每隔一段时间会调用一次这个函数，实现数据文件的加载。当数据文件变多时，每个文件都需要使用一个线程去负责，浪费了资源。
+
+而使用了inotify之后，使用一线程就可以监听多个数据文件，并且实时响应变化。
+
 ### 参考链接
 [用 inotify 监控 Linux 文件系统事件](https://www.ibm.com/developerworks/cn/linux/l-inotify/index.html)
 
