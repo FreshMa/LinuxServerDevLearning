@@ -61,7 +61,7 @@ int InotifyReload::Add(const std::string& file_name, const reloadFn& fn) {
     std::string file_content = loadFile(file_name);
     if (fn) {
         fn(file_content);
-    }else {
+    } else {
         content_map[file_name] = file_content;
     }
 
@@ -104,7 +104,6 @@ int InotifyReload::readEvents(std::vector<struct inotify_event>& events) {
     if (r <= 0) {
         return -1;
     }
-
 
     size_t idx = 0, event_size = 0;
     struct inotify_event *pevent;
@@ -158,7 +157,6 @@ int InotifyReload::handleEvents(const std::vector<struct inotify_event>& events)
     return 0;
 }
 
-//default reloadFn, simple read file content
 std::string InotifyReload::loadFile(const std::string& file_name) {
     std::ifstream ifs(file_name, std::ifstream::in);
     std::string con, line;
