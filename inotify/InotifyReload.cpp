@@ -37,7 +37,9 @@ std::string InotifyReload::GetContent(const std::string& file_name) {
     if (content_map.find(file_name) == content_map.end()) {
         return "";
     }
-    return content_map.at(file_name);
+    std::unique_lock<std::mutex> locker(con_mutex);
+    std::string con = content_map.at(file_name);
+    return con;
 }
 
 //register
@@ -62,6 +64,7 @@ int InotifyReload::Add(const std::string& file_name, const reloadFn& fn) {
     if (fn) {
         fn(file_content);
     } else {
+        std::unique_lock<std::mutex> locker(con_mutex);
         content_map[file_name] = file_content;
     }
 
@@ -145,7 +148,7 @@ int InotifyReload::handleEvents(const std::vector<struct inotify_event>& events)
                 if (fn != nullptr) {
                     fn(content);
                 } else {
-                    //no lock, race condition only occurs when add and handleEvents run at the same time, rarely
+                    std::unique_lock<std::mutex> locker(con_mutex);
                     content_map[file_name] = content;
                 }
                 break;
